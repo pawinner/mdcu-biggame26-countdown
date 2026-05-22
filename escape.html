@@ -20,7 +20,7 @@
                 </div>
                 <div class="score-cell">
                     <span class="score-label">Round</span>
-                    <span class="score-value">1</span>
+                    <span class="score-value" id="round-number">1</span>
                 </div>
                 <div class="score-cell">
                     <span class="score-label">จำนวนบ้านที่ปลดล็อกได้แล้ว</span>
@@ -69,15 +69,20 @@
             const minutes = String(now.getMinutes()).padStart(2, "0");
             const seconds = String(now.getSeconds()).padStart(2, "0");
             document.getElementById("clock").innerText = `${hours}:${minutes}:${seconds}`;
+            updateRoundDisplay(now);
         }
 
         setInterval(updateClock, 1000);
         setInterval(checkTimeoutBlink, 500);
-        updateClock();
+        setInterval(checkRound2IntroSkip, 200);
 
         const videoId = "fXXlVs9f43I";
         const REVEAL_DELAY_MS = 1000;
         const TIMEOUT_TRIGGER_SEC = (45 * 60) + 6;
+        const ROUND_TWO_START_HOUR = 9;
+        const ROUND_TWO_START_MINUTE = 50;
+        const ROUND_TWO_SKIP_FROM_SEC = 4.7;
+        const ROUND_TWO_SKIP_TO_SEC = (10 * 60) + 4.95;
 
         let player;
         let isPlaying = false;
@@ -85,17 +90,20 @@
         let isWinModeActive = false;
         let hasStartedPlayback = false;
         let timeoutTriggered = false;
+        let hasRound2IntroSkipped = false;
         let unlockedHouseCount = 0;
         let unlockedHighlightTimer;
         let breakDotsIndex = 0;
         let breakDotsTimer;
 
+        updateClock();
+
         const penaltySound = new Audio("https://www.myinstants.com/media/sounds/wrong-lie-incorrect-buzzer.mp3");
         penaltySound.volume = 0.35;
         penaltySound.preload = "auto";
 
-        const penalty5Sound = new Audio("https://www.myinstants.com/media/sounds/campana.mp3");
-        penalty5Sound.volume = 0.30;
+        const penalty5Sound = new Audio("https://www.myinstants.com/media/sounds/wrong-lie-incorrect-buzzer.mp3");
+        penalty5Sound.volume = 0.35;
         penalty5Sound.preload = "auto";
 
         const correctSound = new Audio("assets/sounds/WinSFX.mp3");
@@ -123,12 +131,36 @@
         checkMusic.volume = 0.5;
         checkMusic.preload = "auto";
 
+        function getActiveRound(now = new Date()) {
+            const minutesSinceMidnight = (now.getHours() * 60) + now.getMinutes();
+            const roundTwoStart = (ROUND_TWO_START_HOUR * 60) + ROUND_TWO_START_MINUTE;
+            return minutesSinceMidnight >= roundTwoStart ? 2 : 1;
+        }
+
+        function updateRoundDisplay(now = new Date()) {
+            const roundNumber = document.getElementById("round-number");
+            if (!roundNumber) return;
+
+            roundNumber.innerText = String(getActiveRound(now));
+        }
+
         function isPlayerReady() {
             return player
                 && typeof player.getCurrentTime === "function"
                 && typeof player.getDuration === "function"
                 && typeof player.playVideo === "function"
                 && typeof player.pauseVideo === "function";
+        }
+
+        function checkRound2IntroSkip() {
+            if (!isPlayerReady() || hasRound2IntroSkipped || getActiveRound() !== 2) return;
+
+            const currentTime = player.getCurrentTime();
+            if (currentTime >= ROUND_TWO_SKIP_FROM_SEC && currentTime < ROUND_TWO_SKIP_TO_SEC) {
+                hasRound2IntroSkipped = true;
+                player.seekTo(ROUND_TWO_SKIP_TO_SEC, true);
+                if (isPlaying) player.playVideo();
+            }
         }
 
         function incrementUnlockedHouseCount() {
