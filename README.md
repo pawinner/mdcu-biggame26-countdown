@@ -6,7 +6,7 @@ https://pawinner.github.io/mdcu-biggame26-countdown/escape
 
 ## Features & Hotkeys
 P: Play/Pause + Checking Screen  
-Shift + Z: -5% Penalty & +1 Finished Baans
+Shift + Z: -5% Penalty & +1 Finished Baans  
 Shift + X: -20% Penalty  
 Shift + C: Final Congratulations  
 V: Minor Correct  
