@@ -31,6 +31,38 @@ body {
     transition: background-color 0.6s ease;
 }
 
+body.game-escape {
+    --field: #4a286f;
+    --field-line: rgba(239, 221, 255, 0.14);
+}
+
+body.game-escape,
+body.game-physical,
+body.game-fair {
+    background:
+        linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,0.28) 49.5%, rgba(255,255,255,0.28) 50.5%, transparent 50.5%),
+        repeating-linear-gradient(90deg, var(--field-line) 0 2px, transparent 2px 11.11%),
+        radial-gradient(circle at 50% 12%, rgba(242, 184, 75, 0.2), transparent 34%),
+        linear-gradient(135deg, var(--field-dark) 0%, var(--field) 46%, var(--field-deep) 100%);
+}
+
+body.game-escape {
+    --field-dark: #160d21;
+    --field-deep: #211227;
+}
+
+body.game-physical {
+    --field-dark: #081311;
+    --field-deep: #111014;
+}
+
+body.game-fair {
+    --field: #8a6d12;
+    --field-line: rgba(255, 247, 184, 0.16);
+    --field-dark: #1b1607;
+    --field-deep: #2a2108;
+}
+
 body::before,
 body::after {
     content: "";
