@@ -70,11 +70,14 @@
 
         setInterval(updateClock, 1000);
         setInterval(checkTimeoutBlink, 500);
+        setInterval(checkIntroSkip, 200);
         const videoId = "fXXlVs9f43I";
         const REVEAL_DELAY_MS = 1000;
         const TIMEOUT_TRIGGER_SEC = (45 * 60) + 6;
         const ROUND_TWO_START_HOUR = 9;
         const ROUND_TWO_START_MINUTE = 50;
+        const INTRO_SKIP_FROM_SEC = 4.7;
+        const INTRO_SKIP_TO_SEC = (30 * 60) + 4.95;
 
         let player;
         let isPlaying = false;
@@ -82,6 +85,7 @@
         let isWinModeActive = false;
         let hasStartedPlayback = false;
         let timeoutTriggered = false;
+        let hasIntroSkipped = false;
         let breakDotsIndex = 0;
         let breakDotsTimer;
 
@@ -139,6 +143,17 @@
                 && typeof player.getDuration === "function"
                 && typeof player.playVideo === "function"
                 && typeof player.pauseVideo === "function";
+        }
+
+        function checkIntroSkip() {
+            if (!isPlayerReady() || hasIntroSkipped) return;
+
+            const currentTime = player.getCurrentTime();
+            if (currentTime >= INTRO_SKIP_FROM_SEC && currentTime < INTRO_SKIP_TO_SEC) {
+                hasIntroSkipped = true;
+                player.seekTo(INTRO_SKIP_TO_SEC, true);
+                if (isPlaying) player.playVideo();
+            }
         }
 
         function startBreakDots() {
