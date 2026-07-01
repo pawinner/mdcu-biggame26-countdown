@@ -74,6 +74,7 @@
 
         setInterval(updateClock, 1000);
         setInterval(checkTimeoutBlink, 500);
+        setInterval(checkRound1IntroSkip, 200);
         setInterval(checkRound2IntroSkip, 200);
 
         const videoId = "fXXlVs9f43I";
@@ -81,8 +82,10 @@
         const TIMEOUT_TRIGGER_SEC = (45 * 60) + 6;
         const ROUND_TWO_START_HOUR = 9;
         const ROUND_TWO_START_MINUTE = 50;
+        const ROUND_ONE_SKIP_FROM_SEC = 4.7;
+        const ROUND_ONE_SKIP_TO_SEC = (5 * 60) + 4.95;
         const ROUND_TWO_SKIP_FROM_SEC = 4.7;
-        const ROUND_TWO_SKIP_TO_SEC = (10 * 60) + 4.95;
+        const ROUND_TWO_SKIP_TO_SEC = (15 * 60) + 4.95;
 
         let player;
         let isPlaying = false;
@@ -90,6 +93,7 @@
         let isWinModeActive = false;
         let hasStartedPlayback = false;
         let timeoutTriggered = false;
+        let hasRound1IntroSkipped = false;
         let hasRound2IntroSkipped = false;
         let unlockedHouseCount = 0;
         let unlockedHighlightTimer;
@@ -150,6 +154,17 @@
                 && typeof player.getDuration === "function"
                 && typeof player.playVideo === "function"
                 && typeof player.pauseVideo === "function";
+        }
+
+        function checkRound1IntroSkip() {
+            if (!isPlayerReady() || hasRound1IntroSkipped || getActiveRound() !== 1) return;
+
+            const currentTime = player.getCurrentTime();
+            if (currentTime >= ROUND_ONE_SKIP_FROM_SEC && currentTime < ROUND_ONE_SKIP_TO_SEC) {
+                hasRound1IntroSkipped = true;
+                player.seekTo(ROUND_ONE_SKIP_TO_SEC, true);
+                if (isPlaying) player.playVideo();
+            }
         }
 
         function checkRound2IntroSkip() {
